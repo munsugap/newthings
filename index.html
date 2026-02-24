@@ -2,19 +2,39 @@
 <html lang="ko">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>로또 번호 추첨기</title>
 <style>
+    :root {
+        --bg-color: #f2f2f2;
+        --text-color: #333;
+        --ball-bg: #4a90e2;
+        --btn-bg: #222;
+        --btn-text: white;
+    }
+
+    body.dark-mode {
+        --bg-color: #1a1a1a;
+        --text-color: #f2f2f2;
+        --ball-bg: #e67e22;
+        --btn-bg: #f2f2f2;
+        --btn-text: #222;
+    }
+
     body {
         font-family: Arial, sans-serif;
         text-align: center;
-        background: #f2f2f2;
+        background: var(--bg-color);
+        color: var(--text-color);
         padding: 50px;
+        transition: background 0.3s, color 0.3s;
     }
     h1 {
         margin-bottom: 30px;
     }
     .numbers {
         margin: 20px 0;
+        min-height: 60px;
     }
     .ball {
         display: inline-block;
@@ -23,10 +43,17 @@
         line-height: 50px;
         margin: 5px;
         border-radius: 50%;
-        background: #4a90e2;
+        background: var(--ball-bg);
         color: white;
         font-weight: bold;
         font-size: 18px;
+        transition: background 0.3s;
+    }
+    .controls {
+        margin-top: 20px;
+        display: flex;
+        justify-content: center;
+        gap: 10px;
     }
     button {
         padding: 10px 20px;
@@ -34,11 +61,17 @@
         border: none;
         border-radius: 8px;
         cursor: pointer;
-        background: #222;
-        color: white;
+        background: var(--btn-bg);
+        color: var(--btn-text);
+        transition: background 0.3s, color 0.3s;
     }
     button:hover {
-        background: #444;
+        opacity: 0.8;
+    }
+    #theme-toggle {
+        background: transparent;
+        border: 2px solid var(--btn-bg);
+        color: var(--text-color);
     }
 </style>
 </head>
@@ -50,31 +83,49 @@
     번호를 추첨하세요!
 </div>
 
-<button onclick="drawLotto()">추첨하기</button>
+<div class="controls">
+    <button onclick="drawLotto()">추첨하기</button>
+    <button id="theme-toggle" onclick="toggleTheme()">테마 변경</button>
+</div>
 
 <script>
-function drawLotto() {
-    let numbers = [];
+    // 페이지 로드 시 테마 설정
+    document.addEventListener('DOMContentLoaded', () => {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    });
 
-    while (numbers.length < 6) {
-        let num = Math.floor(Math.random() * 45) + 1;
-        if (!numbers.includes(num)) {
-            numbers.push(num);
+    function toggleTheme() {
+        const body = document.body;
+        body.classList.toggle('dark-mode');
+        
+        if (body.classList.contains('dark-mode')) {
+            localStorage.setItem('theme', 'dark');
+        } else {
+            localStorage.setItem('theme', 'light');
         }
     }
 
-    numbers.sort((a, b) => a - b);
-
-    let resultDiv = document.getElementById("result");
-    resultDiv.innerHTML = "";
-
-    numbers.forEach(function(num) {
-        let ball = document.createElement("div");
-        ball.className = "ball";
-        ball.textContent = num;
-        resultDiv.appendChild(ball);
-    });
-}
+    function drawLotto() {
+        let numbers = [];
+        while (numbers.length < 6) {
+            let num = Math.floor(Math.random() * 45) + 1;
+            if (!numbers.includes(num)) {
+                numbers.push(num);
+            }
+        }
+        numbers.sort((a, b) => a - b);
+        let resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = "";
+        numbers.forEach(function(num) {
+            let ball = document.createElement("div");
+            ball.className = "ball";
+            ball.textContent = num;
+            resultDiv.appendChild(ball);
+        });
+    }
 </script>
 
 </body>
